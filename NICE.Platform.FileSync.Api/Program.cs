@@ -25,6 +25,11 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapHub<FileSyncHub>("/v1/hubs/FileSyncHub");
 
 app.Run();
