@@ -1,0 +1,6 @@
+@NICE.Platform.FileSync.Api_HostAddress = http://localhost:5048
+
+GET {{NICE.Platform.FileSync.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

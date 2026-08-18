@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="NICE.Platform.FileSync.Api/NICE.Platform.FileSync.Api.csproj" />
+  <Project Path="NICE.Platform.FileSync.Svc/NICE.Platform.FileSync.Svc.csproj" />
+</Solution>
