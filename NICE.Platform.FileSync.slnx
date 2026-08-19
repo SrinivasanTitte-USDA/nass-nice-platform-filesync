@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="NICE.Platform.FileSync.Api/NICE.Platform.FileSync.Api.csproj" />
+  <Project Path="NICE.Platform.FileSync.Core/NICE.Platform.FileSync.Core.csproj" Id="2f5c905d-dc13-4f34-909f-97f7d6468950" />
   <Project Path="NICE.Platform.FileSync.Svc/NICE.Platform.FileSync.Svc.csproj" />
 </Solution>
