@@ -34,19 +34,6 @@ public class FileSyncHub : Hub
 
         var pipeName = $"pipe-file-sync-svc-{connectionId}";
 
-        //remove existing entry
-        var receiver = new FileSyncReceiver
-        {
-            ConnectionId = connectionId,
-            IPAddress = ipv4Address,
-            //note - follow a consistent naming convention for the pipe name to avoid conflicts and ensure uniqueness
-            //pipe names are also lowercase for linux portability
-            PipeName = pipeName
-        };
-        //only one receiver per ipv4 address is allowed since receivers don't have unique identifiers or user contexts, so remove any existing receiver with the same ipv4 address
-        _connectionTracker.RemoveReceiverByIPV4Address(ipv4Address);
-        _connectionTracker.AddReceiver(receiver);
-
         //create named pipe for the spawned process to connect to the hub
         using var pipeClientStream = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
 
@@ -83,7 +70,26 @@ public class FileSyncHub : Hub
 
         using var process = Process.Start(startInfo);
 
-        Debug.WriteLine($"Started child process with PID: {process?.Id}");
+        if (process == null)
+        {
+            Debug.WriteLine("Failed to start the child process.");
+            return;
+        }
+
+        Debug.WriteLine($"Started child process with PID: {process.Id}");
+
+        var receiver = new FileSyncReceiver
+        {
+            ConnectionId = connectionId,
+            IPAddress = ipv4Address,
+            //note - follow a consistent naming convention for the pipe name to avoid conflicts and ensure uniqueness
+            //pipe names are also lowercase for linux portability
+            PipeName = pipeName,
+            ProcessId = process.Id
+        };
+        //only one receiver per ipv4 address is allowed since receivers don't have unique identifiers or user contexts, so remove any existing receiver with the same ipv4 address
+        _connectionTracker.RemoveReceiverByIPV4Address(ipv4Address);
+        _connectionTracker.AddReceiver(receiver);
 
         await base.OnConnectedAsync();
     }
@@ -126,5 +132,10 @@ public class FileSyncHub : Hub
     {
         //throw new NotImplementedException();
         Debug.WriteLine($"Received message from child for connection {connectionId}: {System.Text.Encoding.UTF8.GetString(memory.Span)}");
+    }
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        var ipv4Address = Context.GetHttpContext()?.Connection.RemoteIpAddress?.MapToIPv4().ToString();
+        await base.OnDisconnectedAsync(exception);
     }
 }

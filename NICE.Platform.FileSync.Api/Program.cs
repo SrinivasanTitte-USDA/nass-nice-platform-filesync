@@ -121,4 +121,11 @@ app.UseAuthorization();
 
 app.MapHub<FileSyncHub>("/v1/hubs/FileSync");
 
+var lifetime = app.Lifetime;
+lifetime.ApplicationStopping.Register(() =>
+{
+    // Perform global resource cleanup
+});
+
+
 app.Run();

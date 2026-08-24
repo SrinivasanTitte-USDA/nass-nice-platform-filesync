@@ -9,6 +9,8 @@ var rootCommand = new RootCommand("NICE.Platform.FileSync.Service");
 
 string clientId = string.Empty;
 string pipeName = string.Empty;
+var cancellationTokenSource = new CancellationTokenSource();
+var cancellationToken = cancellationTokenSource.Token;
 
 Option<string> clientIdOption = new("--clientId", "-c")
 {
@@ -49,18 +51,39 @@ var parseResult = rootCommand.Parse(args).Invoke();
 
 //note: PipeTransmissionMode.Message is only supported on Windows, and not on Linux or MacOS. If you need to support those platforms, you may need to use PipeTransmissionMode.Byte instead, but that would require a different approach to message framing and parsing.
 
-using var pipeServer = new NamedPipeServerStream(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+using var pipeServer = new NamedPipeServerStream(pipeName, PipeDirection.InOut, maxNumberOfServerInstances: 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
 
 Console.WriteLine("[Child] Waiting for parent process to connect...");
 await pipeServer.WaitForConnectionAsync();
 Console.WriteLine("[Child] Connected to parent. Listening for messages...");
 
-//using var reader = new StreamReader(pipeServer);
+using var reader = new StreamReader(pipeServer);
 
 using var streamWriter = new StreamWriter(pipeServer) { AutoFlush = true };
 var fuBar = DateTime.UtcNow.ToString("R");
 
 streamWriter.WriteLine($"Connected at {DateTime.UtcNow}");
+
+#region read/write
+//using var reader = new StreamReader(pipeServer, Encoding.UTF8, leaveOpen: true);
+//using var writer = new StreamWriter(pipeServer, Encoding.UTF8, leaveOpen: true);
+
+//var command = await reader.ReadLineAsync(cancellationToken);
+
+//if (command == "QUIT")
+//{
+//    cancellationTokenSource.Cancel();
+//    //break;
+//}
+
+//// 2. Process command and get a result string
+//string response = ProcessCommand(command);
+
+//// 3. Write response back to parent
+//await writer.WriteLineAsync(response);
+//await writer.FlushAsync(cancellationToken);
+#endregion
+
 
 try
 {
