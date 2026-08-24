@@ -11,6 +11,10 @@ string clientId = string.Empty;
 string pipeName = string.Empty;
 var cancellationTokenSource = new CancellationTokenSource();
 var cancellationToken = cancellationTokenSource.Token;
+//var _fileLogger = new FileLogger();
+const string logPath = @"C:\logs\dev\FileSyncSvc\FileSyncLog-2026-08-24.txt";
+File.AppendAllText(logPath, $"NASS Platform File Sync Worker started at {DateTime.UtcNow:R}{Environment.NewLine}");
+
 
 Option<string> clientIdOption = new("--clientId", "-c")
 {
@@ -31,10 +35,10 @@ rootCommand.SetAction(parseResult =>
 {
     if (parseResult.Errors.Count > 0)
     {
-        Console.WriteLine("Error - NASS Platform File Sync: invalid arguments.");
+        File.AppendAllText(logPath, $"Error - NASS Platform File Sync: invalid arguments.{Environment.NewLine}");
         foreach (var error in parseResult.Errors)
         {
-            Console.WriteLine(error.Message);
+            File.AppendAllText(logPath, $"{error.Message}{Environment.NewLine}");
         }
         return;
     }
@@ -53,16 +57,18 @@ var parseResult = rootCommand.Parse(args).Invoke();
 
 using var pipeServer = new NamedPipeServerStream(pipeName, PipeDirection.InOut, maxNumberOfServerInstances: 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
 
-Console.WriteLine("[Child] Waiting for parent process to connect...");
+File.AppendAllText(logPath, $"[Child] Waiting for parent process to connect...{Environment.NewLine}");
 await pipeServer.WaitForConnectionAsync();
-Console.WriteLine("[Child] Connected to parent. Listening for messages...");
+File.AppendAllText(logPath, $"[Child] Connected to parent. Listening for messages...{Environment.NewLine}");
 
-using var reader = new StreamReader(pipeServer);
+//using var reader = new StreamReader(pipeServer);
 
 using var streamWriter = new StreamWriter(pipeServer) { AutoFlush = true };
 var fuBar = DateTime.UtcNow.ToString("R");
 
-streamWriter.WriteLine($"Connected at {DateTime.UtcNow}");
+File.AppendAllText(logPath, $"[Child] writing connection time to the pipe...{Environment.NewLine}");
+
+streamWriter.WriteLine($"Connected at '{fuBar}'");
 
 #region read/write
 //using var reader = new StreamReader(pipeServer, Encoding.UTF8, leaveOpen: true);

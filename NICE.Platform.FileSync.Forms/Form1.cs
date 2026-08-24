@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.SignalR.Client;
+using System.Diagnostics;
 using System.Net.Http.Json;
 
 namespace NICE.Platform.FileSync.Forms;
@@ -6,6 +7,7 @@ namespace NICE.Platform.FileSync.Forms;
 record TokenResponse(string token);
 public partial class Form1 : Form
 {
+    private HubConnection? _hubConnection;
     public Form1()
     {
         InitializeComponent();
@@ -24,10 +26,23 @@ public partial class Form1 : Form
                 options.AccessTokenProvider = () => Task.FromResult(token);
             })
             .Build();
+
+        _hubConnection = connection;
+
         connection.On<string>("ReceiveMessage", (message) =>
         {
             MessageBox.Show($"Received message: {message}");
         });
         await connection.StartAsync();
+    }
+
+    private async void button2_Click(object sender, EventArgs e)
+    {
+        if (_hubConnection == null || _hubConnection.State != HubConnectionState.Connected)
+        {
+            Debug.WriteLine("Hub connection is not established, or already closed.");
+            return;
+        }
+        await _hubConnection.StopAsync();
     }
 }

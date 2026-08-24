@@ -39,13 +39,8 @@ public class FileSyncHub : Hub
 
         Debug.WriteLine($"Created named pipe client stream for pipe: {pipeName}");
 
-        var cancellationToken = Context.ConnectionAborted;
-        //setup listener for named pipe connection
-        await ListenToChildAsync(connectionId, pipeClientStream, cancellationToken);
-
-        Debug.WriteLine($"Finished listening to child for pipe: {pipeName}");
-
-        var workerPath = @"C:\usdadev\nice\nass-nice-platform-filesync\NICE.Platform.FileSync.Worker\bin\Release\net10.0\publish\NICE.Platform.FileSync.Worker.exe";
+        //var workerPath = @"C:\usdadev\nice\nass-nice-platform-filesync\NICE.Platform.FileSync.Worker\bin\Release\net10.0\publish\NICE.Platform.FileSync.Worker.exe";
+        var workerPath = @"C:\usdadev\nice\nass-nice-platform-filesync\NICE.Platform.FileSync.Worker\bin\Debug\net10.0\NICE.Platform.FileSync.Worker.exe";
 
         //create child process
         var startInfo = new ProcessStartInfo
@@ -91,7 +86,16 @@ public class FileSyncHub : Hub
         _connectionTracker.RemoveReceiverByIPV4Address(ipv4Address);
         _connectionTracker.AddReceiver(receiver);
 
+        //asynchronously connect to the named pipe server created by the child process
+        await pipeClientStream.ConnectAsync();
+
         await base.OnConnectedAsync();
+
+        var cancellationToken = Context.ConnectionAborted;
+        //setup listener for named pipe connection after connect
+        await ListenToChildAsync(connectionId, pipeClientStream, cancellationToken);
+
+        Debug.WriteLine($"Finished listening to child for pipe: {pipeName}");
     }
 
     private async Task ListenToChildAsync(string connectionId, NamedPipeClientStream pipeStream, CancellationToken cancellationToken)
@@ -120,11 +124,6 @@ public class FileSyncHub : Hub
             // Handle unexpected drop or I/O fault
             //LogError(childId, ex);
         }
-        finally
-        {
-            //_activeChildren.TryRemove(childId, out _);
-            await pipeStream.DisposeAsync();
-        }
 
     }
 
@@ -136,6 +135,13 @@ public class FileSyncHub : Hub
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var ipv4Address = Context.GetHttpContext()?.Connection.RemoteIpAddress?.MapToIPv4().ToString();
+
+        if (ipv4Address == null)
+        {
+            Debug.WriteLine("IPV4 Address from the request was null.");
+            return;
+        }
+        _connectionTracker.RemoveReceiverByIPV4Address(ipv4Address);
         await base.OnDisconnectedAsync(exception);
     }
 }

@@ -1,7 +1,5 @@
 <Solution>
+  <Project Path="../../../wrk/nice/clas-2751 - NICE File Sync Solution - Placeholder/poc/NiceFileSync/NICE.Platform.FileSync.Client.Forms/NICE.Platform.FileSync.Client.Forms.csproj" />
   <Project Path="NICE.Platform.FileSync.Api/NICE.Platform.FileSync.Api.csproj" />
-  <Project Path="NICE.Platform.FileSync.Core/NICE.Platform.FileSync.Core.csproj" Id="2f5c905d-dc13-4f34-909f-97f7d6468950" />
-  <Project Path="NICE.Platform.FileSync.Forms/NICE.Platform.FileSync.Forms.csproj" Id="b682b38e-7702-45be-a52b-25217a5a8c82" />
-  <Project Path="NICE.Platform.FileSync.Svc/NICE.Platform.FileSync.Svc.csproj" />
   <Project Path="NICE.Platform.FileSync.Worker/NICE.Platform.FileSync.Worker.csproj" />
 </Solution>
