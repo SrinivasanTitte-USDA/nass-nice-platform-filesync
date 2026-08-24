@@ -13,11 +13,13 @@ public partial class Form1 : Form
 
     private async void button1_Click(object sender, EventArgs e)
     {
+        //var cert = new X509Certificate2(Path.Combine(_environment.ContentRootPath, "sts_dev_cert.pfx"), "1234");
+
         var httpClient = new HttpClient();
         var response = await httpClient.GetFromJsonAsync<TokenResponse>("https://localhost:7221/api/v1/token");
         var token = response?.token;
         var connection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7221/v1/hubs/FileSyncHub", options =>
+            .WithUrl("https://localhost:7221/v1/hubs/FileSync", options =>
             {
                 options.AccessTokenProvider = () => Task.FromResult(token);
             })

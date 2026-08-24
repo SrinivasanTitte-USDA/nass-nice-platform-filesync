@@ -90,7 +90,7 @@ builder.Services
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = "MySignalRServer",
+            ValidIssuer = "nice.nass.usda.gov",
             ValidateAudience = false,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new X509SecurityKey(certService.Certificate)
@@ -118,6 +118,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapHub<FileSyncHub>("/v1/hubs/FileSyncHub");
+app.MapHub<FileSyncHub>("/v1/hubs/FileSync");
 
 app.Run();

@@ -29,16 +29,10 @@ public class TokenController(ServerCertificateService certService, ClientRegistr
 
         var descriptor = new SecurityTokenDescriptor
         {
-            Issuer = "MySignalRServer",
-            Subject = new ClaimsIdentity(
-            [
-                new Claim("client_id", _req.ClientId)
-            ]),
+            Issuer = "nice.nass.usda.gov",
+            Subject = new ClaimsIdentity(new[] { new Claim("client_id", _req.ClientId) }),
             Expires = DateTime.UtcNow.AddHours(1),
-            SigningCredentials = new SigningCredentials(
-                new X509SecurityKey(_certService.Certificate),
-                SecurityAlgorithms.RsaSha256
-            )
+            SigningCredentials = new SigningCredentials(new X509SecurityKey(_certService.Certificate), SecurityAlgorithms.RsaSha256)
         };
 
         var token = handler.CreateToken(descriptor);
