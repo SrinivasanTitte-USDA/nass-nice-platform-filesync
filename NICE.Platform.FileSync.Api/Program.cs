@@ -56,6 +56,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 #region Inject Services
 builder.Services.AddSingleton<TokenRequest>();
 builder.Services.AddSingleton<ServerCertificateService>();
+builder.Services.AddSingleton<ConnectionTracker>();
 builder.Services.AddSingleton<ClientRegistry>();
 #endregion
 

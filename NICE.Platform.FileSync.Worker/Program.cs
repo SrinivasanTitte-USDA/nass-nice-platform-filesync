@@ -55,30 +55,35 @@ Console.WriteLine("[Child] Waiting for parent process to connect...");
 await pipeServer.WaitForConnectionAsync();
 Console.WriteLine("[Child] Connected to parent. Listening for messages...");
 
-using var reader = new StreamReader(pipeServer);
+//using var reader = new StreamReader(pipeServer);
+
+using var streamWriter = new StreamWriter(pipeServer) { AutoFlush = true };
+var fuBar = DateTime.UtcNow.ToString("R");
+
+streamWriter.WriteLine($"Connected at {DateTime.UtcNow}");
 
 try
 {
     // Block and wait for messages indefinitely until parent disconnects or terminates us
-    while (true)
-    {
-        string? message = await reader.ReadLineAsync();
+    //while (true)
+    //{
+    //    string? message = await reader.ReadLineAsync();
 
-        if (message == null)
-        {
-            // If ReadLineAsync returns null, the pipe was closed/disconnected by the parent
-            Console.WriteLine("[Child] Parent disconnected. Exiting.");
-            break;
-        }
+    //    if (message == null)
+    //    {
+    //        // If ReadLineAsync returns null, the pipe was closed/disconnected by the parent
+    //        Console.WriteLine("[Child] Parent disconnected. Exiting.");
+    //        break;
+    //    }
 
-        if (message.Equals("EXIT", StringComparison.OrdinalIgnoreCase))
-        {
-            Console.WriteLine("[Child] Termination command received from parent.");
-            break;
-        }
+    //    if (message.Equals("EXIT", StringComparison.OrdinalIgnoreCase))
+    //    {
+    //        Console.WriteLine("[Child] Termination command received from parent.");
+    //        break;
+    //    }
 
-        ProcessMessage(message);
-    }
+    //    ProcessMessage(message);
+    //}
 }
 catch (Exception ex)
 {
