@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="../../../wrk/nice/clas-2751 - NICE File Sync Solution - Placeholder/poc/NiceFileSync/NICE.Platform.FileSync.Client.Forms/NICE.Platform.FileSync.Client.Forms.csproj" />
   <Project Path="NICE.Platform.FileSync.Api/NICE.Platform.FileSync.Api.csproj" />
+  <Project Path="NICE.Platform.FileSync.Receiver/NICE.Platform.FileSync.Receiver.csproj" />
   <Project Path="NICE.Platform.FileSync.Worker/NICE.Platform.FileSync.Worker.csproj" />
 </Solution>

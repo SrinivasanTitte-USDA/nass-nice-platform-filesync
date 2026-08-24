@@ -116,7 +116,7 @@ public class FileSyncHub : Hub
                     break;
                 }
 
-                ProcessChildMessage(connectionId, buffer.AsMemory(0, bytesRead));
+                await ProcessChildMessage(connectionId, buffer.AsMemory(0, bytesRead));
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -127,10 +127,13 @@ public class FileSyncHub : Hub
 
     }
 
-    private void ProcessChildMessage(string connectionId, ReadOnlyMemory<byte> memory)
+    private async Task ProcessChildMessage(string connectionId, ReadOnlyMemory<byte> memory)
     {
         //throw new NotImplementedException();
-        Debug.WriteLine($"Received message from child for connection {connectionId}: {System.Text.Encoding.UTF8.GetString(memory.Span)}");
+        //Debug.WriteLine($"Received message from child for connection {connectionId}: {System.Text.Encoding.UTF8.GetString(memory.Span)}");
+
+        await Clients.Client(connectionId).SendAsync("ReceiveMessage", System.Text.Encoding.UTF8.GetString(memory.Span));
+
     }
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
